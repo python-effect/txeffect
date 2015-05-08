@@ -16,5 +16,5 @@ setuptools.setup(
         'Programming Language :: Python :: 3',
         ],
     packages=['txeffect'],
-    install_requires=['effect', 'twisted', 'six', 'characteristic>=14.0.0'],
+    install_requires=['effect', 'twisted'],
     )

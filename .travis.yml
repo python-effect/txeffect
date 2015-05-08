@@ -8,10 +8,7 @@ python:
     - "pypy"
 install:
     - pip install -r dev-requirements.txt
-    - pip install six
-    - pip install 'characteristic>=14.0.0'
-    - pip install sphinx
-    - pip install effect
+    - pip install .
 script:
     - make lint
     - py.test
