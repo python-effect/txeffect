@@ -1,0 +1,27 @@
+sudo: false
+
+language: python
+python:
+    - "2.7"
+    - "2.6"
+    - "3.4"
+    - "pypy"
+install:
+    - pip install -r dev-requirements.txt
+    - pip install six
+    - pip install 'characteristic>=14.0.0'
+    - pip install sphinx
+    - pip install effect
+script:
+    - make lint
+    - py.test
+    - make doc
+
+notifications:
+  irc:
+    channels:
+    - "chat.freenode.net#python-effect"
+    skip_join: true
+    use_notice: true
+    template:
+      - "%{repository} %{branch} %{commit} by %{author}: %{message}  %{build_url}"
