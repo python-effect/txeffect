@@ -1,3 +1,4 @@
 testtools
 flake8
 pytest
+sphinx
