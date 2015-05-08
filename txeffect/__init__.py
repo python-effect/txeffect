@@ -22,11 +22,13 @@ from twisted.internet.defer import Deferred
 from twisted.python.failure import Failure
 from twisted.internet.task import deferLater
 
-from ._intents import Delay, ParallelEffects
-from ._base import perform as base_perform
-from ._dispatcher import TypeDispatcher
-from ._utils import wraps
-from .async import perform_parallel_async
+from effect import (
+    Delay,
+    ParallelEffects,
+    perform as base_perform,
+    TypeDispatcher)
+from effect.async import perform_parallel_async
+from effect._utils import wraps  # whoah there
 
 
 def deferred_to_box(d, box):

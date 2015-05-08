@@ -11,20 +11,26 @@ from twisted.internet.defer import Deferred
 from twisted.internet.task import Clock
 from twisted.python.failure import Failure
 
-from ._base import Effect
-from ._intents import (
-    Constant,
-    Delay,
-    base_dispatcher,
-    parallel)
-from ._dispatcher import ComposedDispatcher
-from .twisted import (
+from effect import (
+    Constant, Delay, Effect,
+    base_dispatcher, parallel,
+    ComposedDispatcher,
+)
+from . import (
     deferred_performer,
     exc_info_to_failure,
     make_twisted_dispatcher,
     perform)
 
-from .test_base import func_dispatcher
+
+def func_dispatcher(intent):
+    """
+    Simple effect dispatcher that takes callables taking a box,
+    and calls them with the given box.
+    """
+    def performer(dispatcher, intent, box):
+        intent(box)
+    return performer
 
 
 def _dispatcher(reactor):
