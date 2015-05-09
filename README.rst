@@ -50,6 +50,7 @@ implementations with `txeffect.make_twisted_dispatcher`_.
 .. _`txeffect.make_twisted_dispatcher`: http://txeffect.readthedocs.org/en/latest/api/txeffect.html#txeffect.make_twisted_dispatcher
 
 .. code:: python
+
     from twisted.internet import reactor
     from txeffect import make_twisted_dispatcher
 
