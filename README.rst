@@ -1,14 +1,14 @@
 txEffect
 ========
 
-.. image:: https://travis-ci.org/radix/txeffect.svg?branch=master
-    :target: https://travis-ci.org/radix/txeffect
+.. image:: https://travis-ci.org/python-effect/txeffect.svg?branch=master
+    :target: https://travis-ci.org/python-effect/txeffect
 
 `Effect`_ is a library for helping you write purely functional code by
 isolating the effects (that is, IO or state manipulation) in your code.
 Documentation is available at https://effect.readthedocs.org/.
 
-.. _`Effect`: https://github.com/radix/effect
+.. _`Effect`: https://github.com/python-effect/effect
 
 txEffect is a small library for integrating Twisted and Effect, mostly
 around Deferred<->Effect interoperation. Documentation is available at

@@ -8,7 +8,7 @@ txEffect
 txEffect integrates `Twisted`_ and `Effect`_.
 
 .. _`Twisted`: https://twistedmatrix.com/
-.. _`Effect`: https://github.com/radix/effect/
+.. _`Effect`: https://github.com/python-effect/effect/
 
 API
 ===

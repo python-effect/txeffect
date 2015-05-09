@@ -6,7 +6,7 @@ setuptools.setup(
     version="0.1a1",
     description="Effect/Twisted integration",
     long_description=open('README.rst').read(),
-    url="http://github.com/radix/txeffect/",
+    url="http://github.com/python-effect/txeffect/",
     author="Christopher Armstrong",
     license="MIT",
     classifiers=[
