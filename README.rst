@@ -36,7 +36,7 @@ Implement a performer for an intent that returns a Deferred with
 .. code:: python
 
     from twisted.internet.defer import succeed
-    from txeffect import `deferred_performer`_
+    from txeffect import deferred_performer
 
     @deferred_performer
     def perform_foo(dispatcher, intent):
@@ -51,7 +51,7 @@ implementations with `txeffect.make_twisted_dispatcher`_.
 
 .. code:: python
     from twisted.internet import reactor
-    from txeffect import `make_twisted_dispatcher`_
+    from txeffect import make_twisted_dispatcher
 
     dispatcher = make_twisted_dispatcher(reactor)
     p_effs = parallel([Effect(Delay(5), Effect(Delay(3), Effect(Delay(1))))])
