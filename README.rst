@@ -3,6 +3,8 @@ txEffect
 
 .. image:: https://travis-ci.org/python-effect/txeffect.svg?branch=master
     :target: https://travis-ci.org/python-effect/txeffect
+.. image:: https://img.shields.io/pypi/v/txeffect.svg
+    :target: https://pypi.python.org/pypi/txeffect
 
 txEffect is a small library for integrating Twisted and Effect, mostly
 around Deferred<->Effect interoperation. Documentation is available at
