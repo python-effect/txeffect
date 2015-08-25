@@ -66,11 +66,11 @@ def deferred_performer(f):
             return do_side_effecting_deferred_operation(foo)
     """
     @wraps(f)
-    def deferred_wrapper(*args):
+    def deferred_wrapper(*args, **kwargs):
         box = args[-1]
         pass_args = args[:-1]
         try:
-            result = f(*pass_args)
+            result = f(*pass_args, **kwargs)
         except:
             box.fail(sys.exc_info())
         else:

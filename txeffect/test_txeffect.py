@@ -210,6 +210,16 @@ class DeferredPerformerTests(TestCase):
         wrapped = deferred_performer(new_func)
         self.assertEqual(wrapped.__name__, 'deferred_wrapper')
 
+    def test_kwargs(self):
+        """Additional kwargs are passed through."""
+        @deferred_performer
+        def p(dispatcher, intent, extra):
+            return extra
+
+        dispatcher = lambda _: partial(p, extra='extra val')
+        result = self.successResultOf(perform(dispatcher, Effect('foo')))
+        self.assertEqual(result, 'extra val')
+
 
 class ExcInfoToFailureTests(TestCase):
     """Tests for :func:`exc_info_to_failure`."""
