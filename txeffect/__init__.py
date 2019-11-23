@@ -16,7 +16,6 @@ does.
 from functools import partial
 
 from twisted.internet.defer import Deferred
-from twisted.python.failure import Failure
 from twisted.internet.task import deferLater
 
 from effect import (

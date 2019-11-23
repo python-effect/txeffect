@@ -2,15 +2,15 @@ sudo: false
 
 language: python
 python:
-    - "2.7"
-    - "2.6"
-    - "3.4"
-    - "pypy"
+    - "3.6"
+    - "3.7"
+    - "3.8"
+    - "pypy3"
 install:
     - pip install -r dev-requirements.txt
     - pip install .
 script:
-    - make lint
+    - flake8
     - py.test
     - make doc
 

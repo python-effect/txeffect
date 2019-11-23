@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 from functools import partial
-import sys
 
 from testtools import TestCase
 from testtools.matchers import MatchesListwise, Equals
@@ -110,7 +109,7 @@ class TwistedPerformTests(TestCase):
         self.assertEqual(str(f.value), 'oh dear')
         self.assertRegex(
             f.getTraceback().splitlines()[-3],
-            '^\s+File ".*?test_txeffect.py", line \d+, in test_perform_failure$')
+            r'^\s+File ".*?test_txeffect.py", line \d+, in test_perform_failure$')
 
 
 class DeferredPerformerTests(TestCase):
