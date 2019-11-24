@@ -1,6 +1,3 @@
-lint:
-	flake8 --ignore=E131,E731,W503 txeffect/
-
 build-dist:
 	rm -rf dist
 	python setup.py sdist bdist_wheel

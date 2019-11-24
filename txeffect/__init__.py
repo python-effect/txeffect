@@ -13,13 +13,9 @@ Note that the core effect library does *not* depend on Twisted, but this module
 does.
 """
 
-from __future__ import absolute_import
-
 from functools import partial
-import sys
 
 from twisted.internet.defer import Deferred
-from twisted.python.failure import Failure
 from twisted.internet.task import deferLater
 
 from effect import (
@@ -27,7 +23,7 @@ from effect import (
     ParallelEffects,
     perform as base_perform,
     TypeDispatcher)
-from effect.async import perform_parallel_async
+from effect.parallel_async import perform_parallel_async
 from effect._utils import wraps  # whoah there
 
 
@@ -35,7 +31,7 @@ def deferred_to_box(d, box):
     """
     Make a Deferred pass its success or fail events on to the given box.
     """
-    d.addCallbacks(box.succeed, lambda f: box.fail((f.type, f.value, f.tb)))
+    d.addCallbacks(box.succeed, lambda f: box.fail(f.value))
 
 
 def make_twisted_dispatcher(reactor):
@@ -71,8 +67,8 @@ def deferred_performer(f):
         pass_args = args[:-1]
         try:
             result = f(*pass_args, **kwargs)
-        except:
-            box.fail(sys.exc_info())
+        except Exception as e:
+            box.fail(e)
         else:
             if isinstance(result, Deferred):
                 deferred_to_box(result, box)
@@ -97,11 +93,6 @@ def perform(dispatcher, effect):
     d = Deferred()
     eff = effect.on(
         success=d.callback,
-        error=lambda e: d.errback(exc_info_to_failure(e)))
+        error=lambda e: d.errback(e))
     base_perform(dispatcher, eff)
     return d
-
-
-def exc_info_to_failure(exc_info):
-    """Convert an exc_info tuple to a :class:`Failure`."""
-    return Failure(exc_info[1], exc_info[0], exc_info[2])

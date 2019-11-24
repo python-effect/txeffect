@@ -1,10 +1,9 @@
 from __future__ import absolute_import
 
 from functools import partial
-import sys
 
 from testtools import TestCase
-from testtools.matchers import MatchesListwise, Equals, MatchesException
+from testtools.matchers import MatchesListwise, Equals
 
 from twisted.trial.unittest import SynchronousTestCase
 from twisted.internet.defer import Deferred
@@ -16,9 +15,9 @@ from effect import (
     base_dispatcher, parallel,
     ComposedDispatcher,
 )
+from effect._test_utils import MatchesException
 from . import (
     deferred_performer,
-    exc_info_to_failure,
     make_twisted_dispatcher,
     perform)
 
@@ -95,14 +94,22 @@ class TwistedPerformTests(TestCase):
         effect.twisted.perform fails the Deferred it returns if the ultimate
         result of the Effect is an exception.
         """
+        try:
+            raise ValueError("oh dear")
+        except Exception as e:
+            exc = e
+
         boxes = []
         e = Effect(boxes.append)
         d = perform(func_dispatcher, e)
         self.assertNoResult(d)
-        boxes[0].fail((ValueError, ValueError("oh dear"), None))
+        boxes[0].fail(exc)
         f = self.failureResultOf(d)
         self.assertEqual(f.type, ValueError)
         self.assertEqual(str(f.value), 'oh dear')
+        self.assertRegex(
+            f.getTraceback().splitlines()[-3],
+            r'^\s+File ".*?test_txeffect.py", line \d+, in test_perform_failure$')
 
 
 class DeferredPerformerTests(TestCase):
@@ -219,22 +226,3 @@ class DeferredPerformerTests(TestCase):
         dispatcher = lambda _: partial(p, extra='extra val')
         result = self.successResultOf(perform(dispatcher, Effect('foo')))
         self.assertEqual(result, 'extra val')
-
-
-class ExcInfoToFailureTests(TestCase):
-    """Tests for :func:`exc_info_to_failure`."""
-
-    def test_exc_info_to_failure(self):
-        """
-        :func:`exc_info_to_failure` converts an exc_info tuple to a
-        :obj:`Failure`.
-        """
-        try:
-            raise RuntimeError("foo")
-        except:
-            exc_info = sys.exc_info()
-
-        failure = exc_info_to_failure(exc_info)
-        self.assertIs(failure.type, RuntimeError)
-        self.assertEqual(str(failure.value), "foo")
-        self.assertIs(failure.tb, exc_info[2])
