@@ -18,11 +18,7 @@ from functools import partial
 from twisted.internet.defer import Deferred
 from twisted.internet.task import deferLater
 
-from effect import (
-    Delay,
-    ParallelEffects,
-    perform as base_perform,
-    TypeDispatcher)
+from effect import Delay, ParallelEffects, perform as base_perform, TypeDispatcher
 from effect.parallel_async import perform_parallel_async
 from effect._utils import wraps  # whoah there
 
@@ -39,10 +35,12 @@ def make_twisted_dispatcher(reactor):
     Create a dispatcher that knows how to perform certain built-in Intents
     with Twisted-specific implementations.
     """
-    return TypeDispatcher({
-        ParallelEffects: perform_parallel_async,
-        Delay: deferred_performer(partial(perform_delay, reactor)),
-    })
+    return TypeDispatcher(
+        {
+            ParallelEffects: perform_parallel_async,
+            Delay: deferred_performer(partial(perform_delay, reactor)),
+        }
+    )
 
 
 def deferred_performer(f):
@@ -61,6 +59,7 @@ def deferred_performer(f):
         def perform_foo(dispatcher, foo):
             return do_side_effecting_deferred_operation(foo)
     """
+
     @wraps(f)
     def deferred_wrapper(*args, **kwargs):
         box = args[-1]
@@ -74,6 +73,7 @@ def deferred_performer(f):
                 deferred_to_box(result, box)
             else:
                 box.succeed(result)
+
     return deferred_wrapper
 
 
@@ -91,8 +91,6 @@ def perform(dispatcher, effect):
     ultimate result.
     """
     d = Deferred()
-    eff = effect.on(
-        success=d.callback,
-        error=lambda e: d.errback(e))
+    eff = effect.on(success=d.callback, error=lambda e: d.errback(e))
     base_perform(dispatcher, eff)
     return d

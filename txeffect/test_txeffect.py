@@ -11,15 +11,15 @@ from twisted.internet.task import Clock
 from twisted.python.failure import Failure
 
 from effect import (
-    Constant, Delay, Effect,
-    base_dispatcher, parallel,
+    Constant,
+    Delay,
+    Effect,
+    base_dispatcher,
+    parallel,
     ComposedDispatcher,
 )
 from effect._test_utils import MatchesException
-from . import (
-    deferred_performer,
-    make_twisted_dispatcher,
-    perform)
+from . import deferred_performer, make_twisted_dispatcher, perform
 
 
 def func_dispatcher(intent):
@@ -27,16 +27,15 @@ def func_dispatcher(intent):
     Simple effect dispatcher that takes callables taking a box,
     and calls them with the given box.
     """
+
     def performer(dispatcher, intent, box):
         intent(box)
+
     return performer
 
 
 def _dispatcher(reactor):
-    return ComposedDispatcher([
-        make_twisted_dispatcher(reactor),
-        base_dispatcher
-    ])
+    return ComposedDispatcher([make_twisted_dispatcher(reactor), base_dispatcher])
 
 
 class TestCase(TestCase, SynchronousTestCase):
@@ -46,16 +45,16 @@ class TestCase(TestCase, SynchronousTestCase):
 
 class ParallelTests(TestCase):
     """Tests for :func:`parallel`."""
+
     def test_parallel(self):
         """
         'parallel' results in a list of results of the given effects, in the
         same order that they were passed to parallel.
         """
         d = perform(
-            _dispatcher(None),
-            parallel([Effect(Constant('a')),
-                      Effect(Constant('b'))]))
-        self.assertEqual(self.successResultOf(d), ['a', 'b'])
+            _dispatcher(None), parallel([Effect(Constant("a")), Effect(Constant("b"))])
+        )
+        self.assertEqual(self.successResultOf(d), ["a", "b"])
 
 
 class DelayTests(TestCase):
@@ -76,7 +75,6 @@ class DelayTests(TestCase):
 
 
 class TwistedPerformTests(TestCase):
-
     def test_perform(self):
         """
         effect.twisted.perform returns a Deferred which fires with the ultimate
@@ -87,7 +85,7 @@ class TwistedPerformTests(TestCase):
         d = perform(func_dispatcher, e)
         self.assertNoResult(d)
         boxes[0].succeed("foo")
-        self.assertEqual(self.successResultOf(d), 'foo')
+        self.assertEqual(self.successResultOf(d), "foo")
 
     def test_perform_failure(self):
         """
@@ -106,10 +104,11 @@ class TwistedPerformTests(TestCase):
         boxes[0].fail(exc)
         f = self.failureResultOf(d)
         self.assertEqual(f.type, ValueError)
-        self.assertEqual(str(f.value), 'oh dear')
+        self.assertEqual(str(f.value), "oh dear")
         self.assertRegex(
             f.getTraceback().splitlines()[-3],
-            r'^\s+File ".*?test_txeffect.py", line \d+, in test_perform_failure$')
+            r'^\s+File ".*?test_txeffect.py", line \d+, in test_perform_failure$',
+        )
 
 
 class DeferredPerformerTests(TestCase):
@@ -121,13 +120,12 @@ class DeferredPerformerTests(TestCase):
         and hooks up its Deferred result to the box.
         """
         deferred = Deferred()
-        eff = Effect('meaningless').on(success=lambda x: ('success', x))
-        dispatcher = lambda i: deferred_performer(
-            lambda dispatcher, intent: deferred)
+        eff = Effect("meaningless").on(success=lambda x: ("success", x))
+        dispatcher = lambda i: deferred_performer(lambda dispatcher, intent: deferred)
         result = perform(dispatcher, eff)
         self.assertNoResult(result)
         deferred.callback("foo")
-        self.assertEqual(self.successResultOf(result), ('success', 'foo'))
+        self.assertEqual(self.successResultOf(result), ("success", "foo"))
 
     def test_deferred_failure(self):
         """
@@ -135,49 +133,45 @@ class DeferredPerformerTests(TestCase):
         tuple based on the failure.
         """
         deferred = Deferred()
-        eff = Effect('meaningless').on(error=lambda e: ('error', e))
-        dispatcher = lambda i: deferred_performer(
-            lambda dispatcher, intent: deferred)
+        eff = Effect("meaningless").on(error=lambda e: ("error", e))
+        dispatcher = lambda i: deferred_performer(lambda dispatcher, intent: deferred)
         result = perform(dispatcher, eff)
         self.assertNoResult(result)
-        deferred.errback(Failure(ValueError('foo')))
-        self.assertThat(self.successResultOf(result),
-                        MatchesListwise([
-                            Equals('error'),
-                            MatchesException(ValueError('foo'))]))
+        deferred.errback(Failure(ValueError("foo")))
+        self.assertThat(
+            self.successResultOf(result),
+            MatchesListwise([Equals("error"), MatchesException(ValueError("foo"))]),
+        )
 
     def test_synchronous_success(self):
         """
         If ``deferred_performer`` wraps a function that returns a non-deferred,
         that result is the result of the effect.
         """
-        dispatcher = lambda i: deferred_performer(
-            lambda dispatcher, intent: "foo")
+        dispatcher = lambda i: deferred_performer(lambda dispatcher, intent: "foo")
         result = perform(dispatcher, Effect("meaningless"))
-        self.assertEqual(
-            self.successResultOf(result),
-            "foo")
+        self.assertEqual(self.successResultOf(result), "foo")
 
     def test_synchronous_exception(self):
         """
         If ``deferred_performer`` wraps a function that raises an exception,
         the effect results in that exception.
         """
+
         def raise_():
             raise ValueError("foo")
 
-        dispatcher = lambda i: deferred_performer(
-            lambda dispatcher, intent: raise_())
-        eff = Effect('meaningless').on(error=lambda e: ('error', e))
+        dispatcher = lambda i: deferred_performer(lambda dispatcher, intent: raise_())
+        eff = Effect("meaningless").on(error=lambda e: ("error", e))
         result = perform(dispatcher, eff)
-        self.assertThat(self.successResultOf(result),
-                        MatchesListwise([
-                            Equals('error'),
-                            MatchesException(ValueError('foo'))]))
+        self.assertThat(
+            self.successResultOf(result),
+            MatchesListwise([Equals("error"), MatchesException(ValueError("foo"))]),
+        )
 
     def test_instance_method_performer(self):
         """The @deferred_performer decorator works on instance methods."""
-        eff = Effect('meaningless')
+        eff = Effect("meaningless")
 
         class PerformerContainer(object):
             @deferred_performer
@@ -188,41 +182,46 @@ class DeferredPerformerTests(TestCase):
 
         dispatcher = lambda i: container.performer
         result = self.successResultOf(perform(dispatcher, eff))
-        self.assertEqual(result, (container, dispatcher, 'meaningless'))
+        self.assertEqual(result, (container, dispatcher, "meaningless"))
 
     def test_promote_metadata(self):
         """
         The decorator copies metadata from the wrapped function onto the
         wrapper.
         """
+
         def original(dispatcher, intent):
             """Original!"""
             pass
+
         original.attr = 1
         wrapped = deferred_performer(original)
-        self.assertEqual(wrapped.__name__, 'original')
+        self.assertEqual(wrapped.__name__, "original")
         self.assertEqual(wrapped.attr, 1)
-        self.assertEqual(wrapped.__doc__, 'Original!')
+        self.assertEqual(wrapped.__doc__, "Original!")
 
     def test_ignore_lack_of_metadata(self):
         """
         When the original callable is not a function, a new function is still
         returned.
         """
+
         def original(something, dispatcher, intent):
             """Original!"""
             pass
-        new_func = partial(original, 'something')
+
+        new_func = partial(original, "something")
         original.attr = 1
         wrapped = deferred_performer(new_func)
-        self.assertEqual(wrapped.__name__, 'deferred_wrapper')
+        self.assertEqual(wrapped.__name__, "deferred_wrapper")
 
     def test_kwargs(self):
         """Additional kwargs are passed through."""
+
         @deferred_performer
         def p(dispatcher, intent, extra):
             return extra
 
-        dispatcher = lambda _: partial(p, extra='extra val')
-        result = self.successResultOf(perform(dispatcher, Effect('foo')))
-        self.assertEqual(result, 'extra val')
+        dispatcher = lambda _: partial(p, extra="extra val")
+        result = self.successResultOf(perform(dispatcher, Effect("foo")))
+        self.assertEqual(result, "extra val")

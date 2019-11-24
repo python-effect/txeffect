@@ -9,8 +9,11 @@ python:
 install:
     - pip install -r dev-requirements.txt
     - pip install .
+    # black isn't installing on pypy3, so just skip it
+    - 'if [ "$TRAVIS_PYTHON_VERSION" != "pypy3" ]; then pip install black; fi'
 script:
     - flake8
+    - 'if [ "$TRAVIS_PYTHON_VERSION" != "pypy3" ]; then black --check .; fi'
     - py.test
     - make doc
 
