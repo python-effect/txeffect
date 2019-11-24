@@ -3,7 +3,7 @@ import setuptools
 
 setuptools.setup(
     name="txeffect",
-    version="0.9+",
+    version="1.0.0",
     description="Effect/Twisted integration",
     long_description=open("README.rst").read(),
     url="https://github.com/python-effect/txeffect/",
